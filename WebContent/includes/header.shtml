@@ -1,8 +1,8 @@
 <header>
 	<ul id="main-menu">
 		<li><a href="/">Muro.Cash</a>
-		<li><a href="/components">Components</a>
-		<li><a href="/usage">Usage</a>
+		<li><a href="/components.html">Components</a>
+		<li><a href="/usage.html">Usage</a>
 		<li><a href="https://demo.muro.cash">Demo</a>
 		<li><a href="https://github.com/murocash">Code</a>
 	</ul>
