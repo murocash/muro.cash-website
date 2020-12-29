@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<meta charset="UTF-8">
+<title>Muro.Cash - Usage</title>
+<!--#include virtual="/includes/meta.shtml" -->
+
+</head>
+
+<body>
+	<!--#include virtual="/includes/header.shtml" -->
+	<article>
+		<h1>Usage</h1>
+		<ul >
+			<li><h2 id="dependency">Adding the dependencies</h2>
+				<pre><code>
+&lt;dependency&gt;
+&nbsp;&lt;groupId&gt;cash.muro&lt;/groupId&gt;
+&nbsp;&lt;artifactId&gt;muro.cash&lt;/artifactId&gt;
+&nbsp;&lt;version&gt;${muro.cash.version}&lt;/version&gt;
+&lt;/dependency&gt;
+			</code></pre>
+			<li><h2 id="components">Importing the components</h2>
+				<pre><code>
+@Configuration
+@EntityScan(basePackageClasses = {
+		cash.muro.entities.MuroSettings.class,
+		cash.muro.aop.MuroAspect.class })
+@ComponentScan(basePackageClasses = {
+		com.emiperez.springframework.jsutils.Ajaxl10nController.class,
+		cash.muro.springsecurity.authentication.cashid.CashIdCredentials.class,
+		cash.muro.springsecurity.authorization.controllers.ErrorController.class,
+		cash.muro.controllers.MuroProductController.class,
+		cash.muro.services.AccessedResourceServiceImpl.class})
+@EnableJpaRepositories(basePackageClasses = { cash.muro.repos.AccessedResourceRepository.class })
+public class MuroSpringConf {
+	
+	@Bean
+	public MuroAspect aspects() {
+		return new MuroAspect();
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix = "muro")
+	public MuroSettings muroSettings() {
+		return new MuroSettings();
+	}
+}
+				</pre></code>
+			<li><h2 id="security">Configuring Spring Security</h2>
+				<pre><code>
+@Configuration
+@Order(1)
+@EnableWebSecurity
+@EnableGlobalMethodSecurity(jsr250Enabled = true)
+public class SecurityConf extends WebSecurityConfigurerAdapter {
+		
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
+		http.csrf().ignoringAntMatchers("/cashid/**")
+			.and()
+			.addFilterAfter(new CashIdAuthenticationFilter(authenticationManager(), successHandler()), AbstractPreAuthenticatedProcessingFilter.class)
+			.authorizeRequests(authorizeRequests -> authorizeRequests.anyRequest().permitAll()).logout()
+			.logoutSuccessHandler((new HttpStatusReturningLogoutSuccessHandler(HttpStatus.OK)));
+	}
+
+	@Bean
+	public AuthenticationManager authenticationManager() {
+		return new ProviderManager(Arrays.asList(authenticationProvider()));
+	}
+
+	private SimpleUrlAuthenticationSuccessHandler successHandler() {
+		return new SimpleUrlAuthenticationSuccessHandler() {
+			@Override
+			public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication)
+					throws IOException, ServletException {
+				response.setContentType("text/html;charset=UTF-8");
+				response.getWriter().append("OK");
+				response.setStatus(200);
+			}
+		};
+	}
+
+	@Bean
+	public MuroAuthenticationProvider authenticationProvider() {
+		return new MuroAuthenticationProvider(authoritiesService());
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix = "cashid.authkeys")
+	public AuthKeysConf authKeysConf() {
+		return new AuthKeysConf();
+	}
+	
+	@Bean
+	public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+	    return new SecurityEvaluationContextExtension();
+	}	
+	
+	@Bean
+	public AuthoritiesService authoritiesService() {
+		  return new MuroDemoAuthoritiesService(
+				  Stream.of("bitcoincash:qpscef2g644pe6d6mzxafa9j0araydt8vgw9g9uv2x")
+                  .collect(Collectors.toSet()));
+	}
+}
+</code></pre>
+			<li><h2 id="node-connection">Configuring the connection to the Bitcoin Cash Node</h2>
+				<p>Edit the <code>bch.properties</code> file on <code>src/main/resources</code> folder.</p>
+				<pre><code>
+node=http://127.0.0.1:8332
+username=username
+password=passw
+				</code></pre>
+			<li><h2 id="parameters">Configuring the properties</h2>
+				<p>Muro.Cash appends the following properties to Spring Boot's application.properties file:</p>
+				<pre><code>
+spring.messages.basename=cashid-messages,muro-messages,messages
+
+cashid.authkeys.timetoexpire=120000
+cashid.authkeys.bits=50
+
+muro.daysfree=1
+muro.freepages=3
+muro.freerows=4
+muro.rowsperpage=8
+				</code></pre>
+			<li><h2 id="controllers">Annotating Controllers' methods</h2>
+				<p>Use the <code>@MuroRequest</code> annotation to mark what methods should be filtered by Muro.Cash.
+				<p>Put the result on the view's <code>MuroSettings.MURO_LIST</code> attribute:
+				<pre><code>
+@MuroRequest
+@GetMapping(BASE_PATH + "/{page}")
+public ModelAndView listData(ModelAndView mv, final Principal principal, @PathVariable int page) {
+	mv.addObject(MuroSettings.MURO_LIST, dataRepository.findAllOrderByMyOrder(muroSettings.pageRequest(page - 1)));
+	MuroPaging paging = muroPaging(page);
+	mv.addObject(MuroSettings.MURO_PAGING, paging);
+	...
+	return mv;
+}
+				</code></pre>
+		</ul>
+	</article>
+	<!--#include virtual="/includes/footer.shtml" -->
+
+</body>
+
+</html>
