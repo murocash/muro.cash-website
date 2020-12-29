@@ -13,15 +13,16 @@ body {
 	margin : 0px;
 	display: flex;
 	flex-direction: column;
+	overflow: hidden;
 }
 
 header {
+	display: inline-block;
 	margin: 0 auto;
 }
 
 header ul {
-	display: inline;
-	
+	display: inline;	
 	padding-left: 0.3em;
 	text-align: center;
 }
@@ -45,8 +46,10 @@ header ul li a:hover  {
 }
 
 article {
+	flex: 1;
 	background-color: honeydew;
 	padding: 0;
+	overflow-y: auto;
 }
 
 h1 {
@@ -80,10 +83,22 @@ article ul a:visited {
 	color: lavender;
 }
 
+pre code {
+	font-size: 0.8em;
+	background-color: honeydew;
+	color: darkgreen;
+	width: 99%;
+	margin: 0 auto;
+	overflow: auto;
+	display: inline-block;
+	
+}
+
 footer {
 	padding: 0 1em 0 1em;
-	margin: 0 auto;
 	text-align: justify;
+	width: 100%;
+	display: inline-block;
 }
 
 .bchaddress {
