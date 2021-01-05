@@ -33,7 +33,18 @@ public class MuroSpringConf {
 	
 	@Bean
 	public MuroAspect aspects() {
-		return new MuroAspect();
+	    return new MuroAspect();
+	}
+	
+	@Bean
+	public BchnRpcClient bchnRpcClient() {
+		return new BchnRpcClient.Builder(bchnClientProperties()).idGenerator(new DateTimeIdGenerator()).build();
+	}
+	
+	@Bean
+	@ConfigurationProperties(prefix = "bchn")
+	public BchnClientProperties bchnClientProperties() {
+		return new BchnClientProperties();
 	}
 	
 	@Bean
@@ -95,30 +106,35 @@ public class SecurityConf extends WebSecurityConfigurerAdapter {
 	
 	@Bean
 	public AuthoritiesService authoritiesService() {
-		  return new MuroDemoAuthoritiesService(
-				  Stream.of("bitcoincash:qpscef2g644pe6d6mzxafa9j0araydt8vgw9g9uv2x")
-                  .collect(Collectors.toSet()));
+		return new MuroDemoAuthoritiesService(
+			Stream.of("bitcoincash:qpscef2g644pe6d6mzxafa9j0araydt8vgw9g9uv2x")
+			.collect(Collectors.toSet()));
 	}
 }
 </code></pre>
-			<li><h2 id="node-connection">Configuring the connection to the Bitcoin Cash Node</h2>
-				<p>Edit the <code>bch.properties</code> file on <code>src/main/resources</code> folder.</p>
-				<pre><code>
-node=http://127.0.0.1:8332
-username=username
-password=passw
-				</code></pre>
-			<li><h2 id="parameters">Configuring the properties</h2>
+			<li><h2 id="parameters">Assigning values to application properties</h2>
 				<p>Muro.Cash appends the following properties to Spring Boot's application.properties file:</p>
 				<pre><code>
+#properties to connect to the Bitcoin Cash Node
+bchn.uri=http://127.0.0.1:8332
+bchn.username=username
+bchn.password=password
+
+#localized texts
 spring.messages.basename=cashid-messages,muro-messages,messages
 
+#time, in milliseconds, for cashid nonce to expire
 cashid.authkeys.timetoexpire=120000
+#length, in bits, of cashid nonce
 cashid.authkeys.bits=50
 
+#for how many days are free pages available
 muro.daysfree=1
+#how many pages are free every muro.daysfree days
 muro.freepages=3
+#how many rows, out of muro.rowsperpage will be shown when the user is not logged in, or has no balance
 muro.freerows=4
+#rows shown to users who have enough balance
 muro.rowsperpage=8
 				</code></pre>
 			<li><h2 id="controllers">Annotating Controllers' methods</h2>

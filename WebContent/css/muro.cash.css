@@ -10,7 +10,7 @@ body {
 	background-color: white;
 	font-size: 12pt;
 	font-family: sans-serif;
-	margin : 0px;
+	margin: 0px;
 	display: flex;
 	flex-direction: column;
 	overflow: hidden;
@@ -22,18 +22,18 @@ header {
 }
 
 header ul {
-	display: inline;	
+	display: inline;
 	padding-left: 0.3em;
 	text-align: center;
 }
 
-header ul li {	
+header ul li {
 	display: block;
 	float: left;
 	padding: 0.5em;
 }
 
-header ul li a{
+header ul li a {
 	color: darkgreen;
 	font-weight: bold;
 	font-size: 2.5vmin;
@@ -41,7 +41,7 @@ header ul li a{
 	text-decoration: none;
 }
 
-header ul li a:hover  {
+header ul li a:hover {
 	opacity: 60%;
 }
 
@@ -61,7 +61,6 @@ h1 {
 	font-size: 6vw;
 	padding: 0;
 }
-
 
 article ul {
 	margin: 0.5em;
@@ -87,13 +86,15 @@ article ul a:visited {
 
 pre code {
 	font-size: 0.8em;
-	background-color: honeydew;
+	tab-size: 4;
+	-moz-tab-size: 4; 
+	background-color : honeydew;
 	color: darkgreen;
 	width: 99%;
 	margin: 0 auto;
 	overflow: auto;
 	display: inline-block;
-	
+	background-color: honeydew;
 }
 
 footer {
@@ -107,7 +108,3 @@ footer {
 .bchaddress {
 	font-size: 0.65em;
 }
-
-
-
-
